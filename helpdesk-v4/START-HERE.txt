@@ -1,0 +1,385 @@
+HELPDESK (VERSION 4) - START HERE
+=================================
+
+A plain-English guide. You do not need to be "technical".
+Go one step at a time, in order. Do not skip ahead.
+
+
+--------------------------------------------------------------------
+FILL THIS IN FIRST (so you never have to hunt for it later)
+--------------------------------------------------------------------
+
+   The Pi's login name  (the "PIUSER"):  ______________________
+
+   The Pi's address     (the "PIADDRESS"): ______________________
+       (looks like  mypi.local   or like   192.168.1.50 )
+
+   Helpdesk web address (you get this in Install.txt, Part 7):
+
+       http://______________________:3000
+
+   Admin username:   Beta
+   Admin password:   (you choose it in Install.txt, Part 8. Do NOT write
+                      it here. Keep it in a password manager or a
+                      locked drawer.)
+
+
+--------------------------------------------------------------------
+WHICH FILE SHOULD I READ?
+--------------------------------------------------------------------
+
+   Install.txt ........... Putting Helpdesk on the Pi, step by step,
+                           from nothing. Also: how to turn the login
+                           password OFF (and back on), and fixes for
+                           install problems.
+   START-HERE.txt ........ (this file) Adding helpers, everyday use,
+                           what to do when something goes wrong,
+                           email notifications, safety rules.
+   HOW-TO-GET-HELP.txt ... ONE page for the people who ask for help.
+                           Print it or email it to your team.
+   Uninstall.txt ......... Removing Helpdesk completely, or starting
+                           over with empty tickets.
+   README.md ............. Technical notes. You do not need it.
+
+--------------------------------------------------------------------
+WHAT IS THIS?
+--------------------------------------------------------------------
+
+Helpdesk is a little website that runs on your Raspberry Pi (the tiny
+computer). People who need computer help fill in a form on that
+website. That creates a "ticket". Your team sees the tickets in a
+list, picks them up, fixes the problem, and writes down what they did.
+
+It only works inside your own building or home network. It is not on
+the public internet, and it should stay that way (see "Safety rules").
+
+
+--------------------------------------------------------------------
+WORDS YOU WILL SEE
+--------------------------------------------------------------------
+
+Pi ................ The small computer that runs Helpdesk.
+Ticket ............ One request for help, like "My printer is jammed".
+Admin ............. A boss account. Can do everything.
+Agent ............. A helper account. Can work on tickets, but cannot
+                    add people, change email settings, or delete.
+Terminal .......... A window where you type commands instead of
+                    clicking. On Windows it is called "PowerShell".
+Command ........... A line of text you type, then press Enter.
+Copy and paste .... You can copy any command from this file and
+                    paste it. In PowerShell, right-click to paste.
+
+
+--------------------------------------------------------------------
+HOW TO READ THE COMMANDS IN THIS GUIDE
+--------------------------------------------------------------------
+
+Lines that look like this are things you TYPE (or paste), and then
+press the Enter key:
+
+        like this line
+
+Words in CAPITAL LETTERS (PIUSER, PIADDRESS) are blanks. Swap them
+for what you wrote in the box at the top. Example: if your login name
+is "sam" and the address is "mypi.local", then
+
+        ssh PIUSER@PIADDRESS
+
+becomes
+
+        ssh sam@mypi.local
+
+When you type a password in a terminal, NOTHING appears on the screen
+- no dots, no stars. That is normal and it is working. Just type it
+and press Enter.
+
+
+====================================================================
+PART 1 - ADD YOUR HELPERS  (skip if you work alone)
+====================================================================
+
+Everyone who works on tickets should have their OWN login. Never
+share one login between people.
+
+1. Click  "Users"  at the top of the page.
+2. Find the box "Add User" and fill it in:
+
+      Username ... letters and numbers, at least 3, no spaces
+                   (example: maria)
+      Password ... a TEMPORARY password, at least 10 characters
+      Email ...... optional
+      Role ....... choose one:
+                     Agent = can work on tickets. Choose this for
+                             most people.
+                     Admin = can do everything, including adding
+                             people and deleting tickets. Keep
+                             this for 1 or 2 trusted people.
+
+3. Click "+ Add User".
+4. Tell the person their username and temporary password. The first
+   time they log in, Helpdesk makes them choose their own password.
+
+Other things you can do on this screen:
+   - The key button ("Password") next to a name sets a new password
+     for that person (they must change it when they next log in).
+   - The trash can button removes that person.
+   - You cannot remove your own account from this screen, so you
+     cannot delete yourself by accident.
+
+
+====================================================================
+PART 2 - EVERY DAY: WORKING ON TICKETS
+====================================================================
+
+LOG IN
+   Open the Helpdesk address, click "Admin Login", type your
+   username and password.
+
+SEE NEW TICKETS
+   The list does not update by itself. Click the "Refresh" button
+   (above the list) to see new tickets. Every row is one ticket:
+   its number (like HD-001), the subject, who sent it, what kind of
+   problem, how urgent, and its status.
+
+   Status words:
+      open ....... nobody has picked it up yet
+      assigned ... someone is working on it
+      resolved ... finished
+
+FIND A TICKET
+   Use the three drop-down boxes (Status, Category, Priority) or
+   type in the "Search..." box to narrow the list.
+
+WORK ON A TICKET
+   1. Click the  "Open"  button at the end of the row.
+   2. A window opens showing the whole request.
+   3. Fill in what you need:
+         Assign To ......... pick the person doing the work. (If you
+                             pick someone, the status changes from
+                             open to assigned for you.)
+         Category .......... fix it if the person picked the wrong one
+         Status ............ open / assigned / resolved
+         Resolution Notes .. write what you did, in plain words.
+                             The person who asked will be able to
+                             read this, so be polite and clear.
+   4. Click "Save Changes".
+
+   When a ticket is finished, set Status to "resolved" and write the
+   Resolution Notes before you save.
+
+THE "DELETE" BUTTON
+   Only Admins see it. It removes the ticket FOREVER. There is no
+   undo. In most cases just mark the ticket "resolved" instead.
+
+WHEN YOU ARE DONE
+   Click "Logout" at the top. Always do this on a shared computer.
+
+HELPERS GET LOGGED OUT AUTOMATICALLY
+   After 1 hour of doing nothing, or 8 hours in total, you are logged
+   out. Just log in again. Nothing is lost.
+
+
+====================================================================
+PART 3 - IF SOMETHING GOES WRONG
+====================================================================
+
+To run commands on the Pi again, open PowerShell and type
+        ssh PIUSER@PIADDRESS
+then go into the folder:
+        cd helpdesk-v4
+
+--------------------------------------------------------------------
+A. "I forgot the admin password" or "I missed the first password"
+--------------------------------------------------------------------
+   Log in to the Pi (above), go into the folder, then type:
+
+        node server.js --reset-admin
+
+   It prints a new one-time password. Copy it. Then follow
+   Install.txt, Part 8 (log in as Beta with that password, then
+   choose your own).
+
+   To reset a different person's login, add their username:
+
+        node server.js --reset-admin maria
+
+--------------------------------------------------------------------
+B. "The web page will not open"
+--------------------------------------------------------------------
+   Go through these in order:
+   1. Is the Pi plugged in and is its light on? Wait 2 minutes after
+      plugging it in.
+   2. Is your computer on the same network (same Wi-Fi) as the Pi?
+      It will not work from home if the Pi is at the office.
+   3. Did you type the address exactly? It must start with  http://
+      (not https) and end with  :3000
+   4. Log in to the Pi and check Helpdesk is running:
+
+        sudo systemctl status helpdesk
+
+      You want to see the words  active (running)  in green.
+      Press the  q  key to get out of that screen.
+   5. If it is not running, start it again:
+
+        sudo systemctl restart helpdesk
+
+      Wait 10 seconds and try the web page again.
+   6. Still stuck? See the last messages Helpdesk wrote:
+
+        sudo journalctl -u helpdesk -n 50 --no-pager
+
+      Copy that text and send it to whoever helps you with computers.
+
+--------------------------------------------------------------------
+C. "Too many failed logins. Try again later."
+--------------------------------------------------------------------
+   Helpdesk locks logins for a while after many wrong passwords. This
+   protects you from people guessing. Wait 15 minutes, then try again
+   with the right password. (If you do not know the right password,
+   use problem A.)
+
+--------------------------------------------------------------------
+D. "The power went out / the Pi was unplugged"
+--------------------------------------------------------------------
+   Nothing to do. Plug it in, wait 2 minutes, and Helpdesk starts
+   by itself. Your tickets are saved on the Pi.
+
+--------------------------------------------------------------------
+E. "How do I make a backup?"
+--------------------------------------------------------------------
+   Your tickets and people live in two files. Copy them somewhere
+   safe once a week. On the Pi, type these two lines:
+
+        mkdir -p ~/helpdesk-backup
+        cd ~/helpdesk-v4
+        cp tickets.json users.json ~/helpdesk-backup/
+
+   That makes a folder called helpdesk-backup with the copies. Best
+   of all, also copy that folder to a USB stick or another computer.
+   A backup that lives only on the Pi is lost if the Pi breaks.
+
+--------------------------------------------------------------------
+F. "How do I stop or start Helpdesk on purpose?"
+--------------------------------------------------------------------
+   Stop:     sudo systemctl stop helpdesk
+   Start:    sudo systemctl start helpdesk
+   Restart:  sudo systemctl restart helpdesk
+
+--------------------------------------------------------------------
+G. "I want to turn the password off (or back on)"
+--------------------------------------------------------------------
+   See Install.txt, Part 11. It explains what changes, the warning
+   that comes with it, and the exact lines to type.
+
+--------------------------------------------------------------------
+H. "I want to remove Helpdesk"
+--------------------------------------------------------------------
+   See Uninstall.txt.
+
+
+====================================================================
+PART 4 - OPTIONAL: EMAILS WHEN TICKETS ARRIVE
+====================================================================
+
+Skip this on day one. Helpdesk works fine without email. Do it later
+if you want these two things:
+   - You get an email when a new ticket arrives.
+   - The person who asked gets an email when you change their
+     ticket (for example when it is resolved).
+
+You need a Gmail account that Helpdesk can send from. Do NOT use the
+normal Gmail password - Google gives you a special one for this.
+
+1. Sign in to that Gmail account in your browser.
+2. Turn on "2-Step Verification" for it. (Google requires this.)
+   Search the web for:  google account 2-step verification
+3. Go to   https://myaccount.google.com/apppasswords
+   Create a new app password. Name it  Helpdesk.
+   Google shows 16 letters. Copy them.
+4. In Helpdesk, log in as an Admin, click "Users", then click the
+   "Email" tab.
+5. Fill in:
+      Gmail App Password ........... paste the 16 letters
+      From Email ................... that Gmail address
+      Admin Notification Email ..... where YOU want new-ticket emails
+   Tick the boxes:
+      [x] Notify on new ticket
+      [x] Notify on status change
+      [x] Email the assignee when a ticket is assigned to them
+      [x] Enable email notifications
+6. Click "Save Settings". Then click "Send Test". Check your inbox.
+
+If the test fails, the red message now tells you why (for example,
+"Gmail refused the login - use an App Password"). Fix that and try
+again.
+
+When you assign a ticket to a person, that person gets an email too -
+but only if their user account has an email address. For people you
+already added: Users -> click "Email" next to their name and type
+it in. You will not get an email for a ticket you assign to
+yourself.
+
+After you click Save on a ticket, the green message tells you what
+happened with the email, for example "Email queued to Sam" or "No email
+was sent to Sam: they have no email address saved". If you ever think
+an email is missing, read that message first.
+
+You can move a ticket back to Open at any time (for example from
+Resolved). Helpdesk keeps the choice you make.
+
+When a ticket is marked Resolved, both the person who submitted it
+and the technician it was assigned to get an email.
+
+Emails are sent in the background, so a ticket never waits on them.
+If Gmail is slow or fails, Helpdesk tries again after 30 seconds,
+2 minutes and 10 minutes. Under the Email settings, "Recent email
+activity" shows what was SENT, is RETRYING, FAILED or was DROPPED.
+
+Helpdesk limits how many emails it sends per hour (10 per person,
+60 in total), on purpose, so it cannot be used to flood anyone's
+inbox. Anything dropped for that reason shows up in the activity list.
+
+
+====================================================================
+SAFETY RULES  (please read these; they are short)
+====================================================================
+
+1. KEEP IT INSIDE YOUR NETWORK.
+   Do not set up "port forwarding" on your router for Helpdesk, and do
+   not put its address on the internet. It does not use the secure
+   (https) kind of connection. Inside your own network that is okay.
+   If people need it from outside, ask an IT person to set up a VPN.
+
+2. ONE LOGIN PER PERSON. Never share passwords. When someone leaves,
+   remove them (Users -> trash can).
+
+3. NEVER TYPE PASSWORDS INTO TICKETS. Tell your team the same.
+
+4. USE STRONG PASSWORDS. 10+ characters; random words work well.
+
+5. BACK UP WEEKLY (Part 3, problem E).
+
+6. KEEP THE PI UP TO DATE ONCE A MONTH. Log in to the Pi and type
+   these two lines, one at a time:
+
+        sudo apt update
+        sudo apt upgrade -y
+
+   Then restart the Pi:   sudo reboot
+   (Wait 2 minutes. Helpdesk comes back by itself.)
+
+7. THINK TWICE BEFORE TURNING THE PASSWORD OFF.
+   It lets EVERYONE on your network (guests on your Wi-Fi too) read
+   every ticket. Only do it on a network you fully trust. Boss jobs
+   (adding people, email settings, deleting tickets) still need the
+   admin password either way. See Install.txt, Part 11.
+
+
+====================================================================
+THAT'S ALL
+====================================================================
+
+Need to install it again, or move it? Install.txt.
+Got a newer zip file? Update.txt (one command: bash update.sh).
+Need to take it off the Pi? Uninstall.txt.
+Everything else you need day to day is in this file.
