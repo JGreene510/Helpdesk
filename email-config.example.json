@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "gmailAppPassword": "your-16-char-app-password-here",
+  "fromEmail": "",
+  "adminEmail": "",
+  "notifyNewTicket": true,
+  "notifyStatusChange": true
+}

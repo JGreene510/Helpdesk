@@ -1,0 +1,310 @@
+UPDATE HELPDESK  -  STEP BY STEP, FROM ZERO
+===========================================
+
+You do not need to know anything about computers to follow this.
+Go in order. Do not skip steps.
+
+Your tickets, logins and email settings are NEVER inside the zip
+file, so updating does not touch them. A safety copy is also made
+for you automatically.
+
+Time needed: about 5 minutes.
+
+
+--------------------------------------------------------------------
+WHICH PART DO I READ?
+--------------------------------------------------------------------
+
+   I have the OLD version (the folder is called helpdesk-v3)
+        --> read PART 1.  You only ever do this once.
+
+   I already have version 4 and I got a newer zip file
+        --> read PART 2.  This is the quick one.
+
+   I am not sure which version I have
+        --> read PART 3.
+
+
+--------------------------------------------------------------------
+WORDS YOU WILL SEE
+--------------------------------------------------------------------
+
+   The Pi ......... The small computer that runs Helpdesk.
+   Zip file ....... One file that holds the whole program, squashed
+                    together. It is named something like
+                    helpdesk-v4.zip
+   Terminal ....... The black window where you type commands on the Pi.
+                    Install.txt, Part 4 shows how to open it.
+   Folder ......... Same as on Windows: a place that holds files.
+
+HOW TO TYPE A COMMAND: type it exactly, then press Enter. You can
+copy and paste. If it asks for a password, you will see nothing
+appear as you type. That is normal. Type it and press Enter.
+
+
+====================================================================
+PART 1 - MOVING FROM VERSION 3 TO VERSION 4  (one time only)
+====================================================================
+
+Version 4 is put NEXT TO the old version, not on top of it. Your old
+folder stays exactly as it is, as a backup. Nothing is lost.
+
+1. Make a safety copy of your tickets.
+   Open Uninstall.txt, go to PART 1, and do steps 1 and 2 there.
+   (It takes two minutes. It is worth it.)
+
+2. Send helpdesk-v4.zip to the Pi.
+   Do exactly what Install.txt, PART 3 says. Use the same place you
+   used the first time.
+
+3. Open the Terminal on the Pi and log in.
+   Do what Install.txt, PART 4 says.
+
+4. Go to the folder that HOLDS the old helpdesk-v3 folder.
+   If you followed Install.txt as written, type:
+
+        cd ~
+
+   If your old folder is somewhere else, for example in a folder
+   called "shared", type that instead:
+
+        cd ~/shared
+
+   Not sure? Type this to find it:
+
+        find ~ -maxdepth 3 -name "helpdesk-v3" -type d
+
+   It prints where the old folder is. Type  cd  and then everything
+   it printed EXCEPT the last part "/helpdesk-v3".
+
+5. Unpack the new version. Use the name of the zip file you sent. If
+   you put it in your home folder, type:
+
+        unzip ~/helpdesk-v4.zip
+
+   (If it says "unzip: command not found", type
+        sudo apt install unzip
+    press y when asked, then try the unzip line again.)
+
+   You now have a NEW folder called helpdesk-v4 next to the old one.
+
+6. Go into the new folder and start the setup:
+
+        cd helpdesk-v4
+        bash setup.sh
+
+7. The setup asks you questions. Type the letter and press Enter:
+
+   "Copy its tickets, logins and email settings into this v4 folder?"
+        Type   y
+        (This brings ALL your tickets, logins and email settings with
+         you. If you do not see this question, see "Problems" below.)
+
+   "Install and start the systemd service now?"
+        Type   y
+        (It may ask for the Pi's password. Type it, press Enter.)
+
+   Any question about installing Node.js: type  y
+
+   Wait about a minute. When it stops, it prints a few lines.
+
+8. Check that it worked.
+   On your computer, open the Helpdesk web page and press
+   Ctrl+Shift+R (hold Ctrl and Shift, tap R). This forces a fresh
+   copy of the page.
+
+   At the very top, next to the word Helpdesk, you should now see
+   a small   v4.0.0   (or a higher number).
+
+   Log in with your SAME username and password as before.
+
+9. Look around: open a ticket, open Users. Everything is still there.
+
+10. The old helpdesk-v3 folder is no longer used. Keep it for a few
+    weeks as a spare copy. When you are happy, you can delete it:
+
+        rm -rf ~/helpdesk-v3
+
+    (Change  ~/helpdesk-v3  to wherever the old folder really is.)
+
+
+====================================================================
+PART 2 - UPDATING VERSION 4 TO A NEWER VERSION  (the quick way)
+====================================================================
+
+This is the everyday update. One command does everything: it unpacks
+the new zip, saves a safety copy of your data, installs what is new
+and restarts Helpdesk.
+
+1. Send the new zip file to the Pi.
+   Do what Install.txt, PART 3 says. Putting it in your home folder
+   or in the "shared" folder both work.
+
+   TIP: if an older zip with the same name is already there, the
+   new one replaces it. That is fine and wanted.
+
+2. Open the Terminal on the Pi and log in (Install.txt, PART 4).
+
+3. Go into the Helpdesk folder. If you followed this guide as
+   written:
+
+        cd ~/helpdesk-v4
+
+   If yours is in the "shared" folder:
+
+        cd ~/shared/helpdesk-v4
+
+4. Run the update:
+
+        bash update.sh
+
+   It looks for the newest helpdesk zip file by itself, and prints
+   three lines like these:
+
+        Using zip   : /home/sam/helpdesk-v4.zip
+        Updating    : /home/sam/helpdesk-v4   (currently version 4.0.0)
+        New version : 4.1.0
+
+   READ THEM. They tell you which zip it found and what it is about
+   to do.
+
+5. It asks:  Go ahead and update? [y/N]
+   Type   y   and press Enter.
+
+   If it prints  "NOTE: this zip is the SAME version you already
+   have"  then it found an OLD zip, not the new one. Type  n  and
+   press Enter. Nothing is changed. Then see "Problems" below.
+
+6. If it asks for the Pi's password, type it and press Enter.
+
+7. When it says  "Helpdesk is running."  you are done.
+
+8. On your computer: open the Helpdesk page and press Ctrl+Shift+R.
+   Next to the word Helpdesk at the top you should see the new
+   version number. That is your proof the update worked.
+
+
+--------------------------------------------------------------------
+If you have more than one zip file
+--------------------------------------------------------------------
+
+Tell the update exactly which one to use. Replace the path with the
+real location of the zip:
+
+        bash update.sh /home/sam/shared/helpdesk-v4.zip
+
+
+====================================================================
+PART 3 - WHICH VERSION AM I RUNNING?
+====================================================================
+
+EASIEST: open the Helpdesk web page. The version is written in small
+letters next to the word Helpdesk at the top, like   v4.0.0
+(If you see no number at all, you are on the OLD version 3. Go to
+ PART 1.)
+
+ON THE PI: go into the Helpdesk folder and type
+
+        grep '"version"' package.json
+
+It prints something like    "version": "4.0.0",
+
+That tells you what is SAVED in the folder. If the page and this
+number disagree, Helpdesk was not restarted after the update. Type:
+
+        sudo systemctl restart helpdesk
+
+then press Ctrl+Shift+R on the web page.
+
+
+====================================================================
+PROBLEMS AND FIXES
+====================================================================
+
+"I did not see the question about copying my tickets"
+--------------------------------------------------------------------
+Helpdesk only asks when it can find your old helpdesk-v3 folder, and
+only when the new folder has no tickets of its own yet. Copy them
+yourself. Change the first path to where your OLD folder really is,
+then type these (they are all one line each):
+
+        cp ~/helpdesk-v3/users.json ~/helpdesk-v3/tickets.json .
+        cp ~/helpdesk-v3/email-config.json .
+        chmod 600 users.json tickets.json email-config.json
+        sudo systemctl restart helpdesk
+
+(Make sure you are inside the new helpdesk-v4 folder first.)
+
+"I logged in and it is empty / asks me for a brand new password"
+--------------------------------------------------------------------
+The new version started with no data of its own. Stop and copy your
+data using the lines directly above, then reload the page.
+
+"bash update.sh says it could not find a zip file"
+--------------------------------------------------------------------
+It looks in your home folder, the "shared" folder and "Downloads".
+Check where the zip is:
+
+        ls -l ~/*.zip ~/shared/*.zip
+
+Then name it:  bash update.sh /full/path/to/the.zip
+
+"The update says the SAME version"
+--------------------------------------------------------------------
+It picked up an old zip. Common reason: the new zip file was saved
+somewhere else, or under a different name. List your zip files with
+the  ls -l  line above. The size and the date tell you which is the
+newest. Then run  bash update.sh  again with the full path (see
+"If you have more than one zip file").
+
+NOTE: file sizes shown on Windows are rounded, so two different
+versions can both show as "62 KB". Trust the version number that
+update.sh prints, not the size.
+
+"Helpdesk did NOT start"
+--------------------------------------------------------------------
+Type this and read the last lines it prints:
+
+        sudo journalctl -u helpdesk -n 30 --no-pager
+
+If you cannot make sense of them, copy those lines and send them to
+the person who gave you Helpdesk.
+
+"I want to go back to the old version"
+--------------------------------------------------------------------
+Your tickets are safe: the update saved a copy in a folder whose
+name starts with  backup-  inside the Helpdesk folder. To go back to
+version 3, open the Terminal, go into the OLD helpdesk-v3 folder and
+type:
+
+        bash setup.sh
+
+Answer  y  to the service question. It points Helpdesk back to the
+old folder. (Tickets made while on version 4 are only in the v4
+folder.)
+
+"I need my safety copy"
+--------------------------------------------------------------------
+Every time update.sh runs, it saves your data first in a folder like
+
+        backup-20261115-090003
+
+inside the Helpdesk folder. To use it, go into that folder, copy the
+three files back, and restart (change the folder name to yours):
+
+        cd ~/helpdesk-v4
+        cp backup-20261115-090003/*.json .
+        sudo systemctl restart helpdesk
+
+Old backup- folders are small. Delete them whenever you like:
+
+        rm -rf ~/helpdesk-v4/backup-*
+
+
+====================================================================
+THAT'S IT
+====================================================================
+
+Next: START-HERE.txt   - everyday use
+      Install.txt      - first-time setup from zero
+      Uninstall.txt    - how to remove Helpdesk completely
