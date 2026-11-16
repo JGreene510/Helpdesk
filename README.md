@@ -24,7 +24,7 @@ No database, no framework, no cloud account: plain Node.js and two JSON files.
 ## Quick start
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/helpdesk.git
+git clone https://github.com/JGreene510/helpdesk.git
 cd helpdesk
 bash setup.sh          # as your normal user, not root
 ```
