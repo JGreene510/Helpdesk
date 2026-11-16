@@ -1,6 +1,0 @@
-node_modules/
-users.json
-tickets.json
-email-config.json
-*.tmp
-backup-*/
