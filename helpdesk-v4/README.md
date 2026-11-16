@@ -1,35 +1,75 @@
-# Helpdesk v4
+# Helpdesk
 
-> **New here, or not technical?** Start with these plain-English files:
-> **Install.txt** (setup from zero, plus how to turn the login password off and on),
-> **START-HERE.txt** (helpers, everyday use, fixes), **Uninstall.txt** (remove it or start over),
-> **Update.txt** (moving to a newer version, one command), and **HOW-TO-GET-HELP.txt** (one page to give to the people who submit tickets).
-> The rest of this file is the technical reference.
+**A small, self-hosted help desk for a Raspberry Pi or any computer on your network.**
+People submit tickets from a simple web page; your team works them from a dashboard.
+No database, no framework, no cloud account: plain Node.js and two JSON files.
 
-A small self-hosted ticketing system for a Raspberry Pi or any LAN box. Plain Node.js,
-no framework, no database (JSON files). The only dependency is `nodemailer`, and only
-for the optional Gmail notifications.
+![Helpdesk dashboard](docs/screenshot-dashboard.png)
 
-## Install
+## Features
+
+* **Ticket form for everyone, no login needed.** Name, email, subject, category, priority. Submitters can check their ticket's status later with the ticket ID plus their email address.
+* **Staff dashboard.** Counts, filters, search, assign a ticket to a person, write the resolution, move it between Open, Assigned and Resolved.
+* **Email notifications (optional, Gmail).** The admin gets new tickets, the submitter gets a confirmation and status updates, the assigned tech is emailed when a ticket is assigned to them and when it is resolved. Messages are queued and retried, and *Recent email activity* shows what was sent and what failed.
+* **Admins and agents.** Admins manage users and email settings; agents work tickets.
+* **Built to be safe on a small network.** Hashed passwords with forced first-login change, rate limiting, escaped output, owner-only data files. See [Security notes](#security-notes).
+* **Easy to run and easy to update.** One `setup.sh` to install, one `update.sh` to update, and plain-English guides for people who are not technical.
+
+## Requirements
+
+* A Raspberry Pi, or any Linux box (Ubuntu/Debian are what it is tested on), or any machine that runs Node.js.
+* Node.js 18 or newer. `setup.sh` offers to install it for you.
+* Optional: a Gmail account with an App Password, for email notifications.
+
+## Quick start
 
 ```bash
+git clone https://github.com/YOUR-USERNAME/helpdesk.git
+cd helpdesk
 bash setup.sh          # as your normal user, not root
 ```
 
-`setup.sh` (first install, and the one-time move from v3: it offers to copy your data from a sibling `helpdesk-v3` folder) checks for Node 18+, runs `npm install`, generates a systemd unit for your
-user and folder, and (if you say yes) starts the service.
+`setup.sh` checks for Node 18+, installs the one dependency (`nodemailer`, used only for email), creates a systemd service for your user and folder, and starts it.
 
-On the very first start the server creates an administrator named `Beta` with a
-**random one-time password** printed to the log:
+Then open `http://<your-pi-address>:3000`. Staff click **Admin Login**.
+
+On the very first start the server creates an administrator named `Beta` with a **random one-time password** printed to the log:
 
 ```bash
 sudo journalctl -u helpdesk -n 40 --no-pager | grep -E 'username|password'
 ```
 
-You must change it at first login. If you lose it: `node server.js --reset-admin`
-(add a username to reset a specific account).
+You must change it at first login. Lost it? `node server.js --reset-admin`.
 
-Open `http://<pi-address>:3000`. Staff click **Admin Login**.
+Just want to try it without installing a service? `npm install && node server.js`.
+
+## Guides (plain English)
+
+Written for people who have never used a terminal. Start with **Install.txt** if you are new.
+
+| File | What it is |
+| --- | --- |
+| [Install.txt](Install.txt) | Setup from zero, step by step, including how to turn the login password off and on |
+| [START-HERE.txt](START-HERE.txt) | Adding helpers, everyday use, email setup, common problems |
+| [HOW-TO-GET-HELP.txt](HOW-TO-GET-HELP.txt) | One page to hand to the people who submit tickets |
+| [Update.txt](Update.txt) | Moving to a newer version with one command |
+| [Uninstall.txt](Uninstall.txt) | Removing Helpdesk, or starting over |
+
+## Security notes
+
+* **Keep it on your own network.** It speaks plain HTTP. Do not port-forward it to the internet. For remote access, put it behind a reverse proxy with HTTPS (for example Caddy) or a VPN such as WireGuard or Tailscale.
+* Passwords use scrypt with a per-user salt, a 10-character minimum and a constant-time compare.
+* Login attempts are throttled per IP and per username; ticket submission and lookups are rate limited.
+* Ticket lookup needs the ticket ID **and** the email address it was submitted with.
+* Data files are written atomically with owner-only permissions (`600`). Your logins, tickets and Gmail app password live in `users.json`, `tickets.json` and `email-config.json`, which are in `.gitignore`. Never commit them.
+* Admin actions are logged as `[audit]` lines (`journalctl -u helpdesk | grep audit`).
+* Run `npm audit` now and then and keep Node and `nodemailer` updated.
+
+Found a security problem? Please open a private report via the repository's **Security** tab rather than a public issue.
+
+---
+
+# Technical reference
 
 ## Configuration (environment variables)
 
@@ -68,17 +108,6 @@ It is still a trade-off: everyone on the LAN, guests included, can read tickets 
 * **Agent**: view and work tickets. No user management, no email settings, no deleting.
 
 New users and admin-reset passwords must be changed at next login.
-
-## Security notes
-
-* **LAN only.** It speaks plain HTTP. Do not port-forward it. For remote access, put it behind
-  a reverse proxy with HTTPS (for example Caddy) or a VPN such as WireGuard/Tailscale.
-* Passwords: scrypt with a per-user salt, 10-character minimum, constant-time compare.
-* Login throttling per IP and per username; ticket submission and lookups are rate limited.
-* Ticket lookup needs the ticket ID **and** the email address it was submitted with.
-* Data files are written atomically with owner-only permissions (`600`).
-* Admin actions are written to the log as `[audit]` lines (`journalctl -u helpdesk | grep audit`).
-* Run `npm audit` now and then and keep Node and `nodemailer` updated.
 
 ## Updating
 
@@ -149,3 +178,7 @@ and the v2 upgrade path. Needs Node 18+ and nothing else.
   `addEventListener`; output escaping is the main protection today.
 * Optional TLS directly in Node, or a documented Caddy config.
 * Attachments, ticket comments and a search box.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
